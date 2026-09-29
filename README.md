@@ -21,14 +21,11 @@ classDiagram
         #TipoMidia tipo
         #String genero
         #int ano
-        #int duracaoMinutos
         #String classificacaoIndicativa
         #List~String~ elenco
         #StatusVisualizacao status
         #float nota
-        #DateTime dataHoraConclusao
         +titulo() String
-        +duracaoMinutos() int
         +nota() float
         +status() StatusVisualizacao
         +__str__() String
@@ -38,6 +35,8 @@ classDiagram
     }
 
     class Filme {
+        -int duracaoMinutos
+        +duracaoMinutos() int
         +__str__() String
     }
 
@@ -53,6 +52,8 @@ classDiagram
     class Temporada {
         -int numero
         -List~Episodio~ episodios
+        +numero() int
+        +duracaoMinutos() int
         +adicionarEpisodio(episodio: Episodio) void
         +calcularNotaMedia() float
     }
@@ -65,6 +66,10 @@ classDiagram
         -Date dataLancamento
         -StatusVisualizacao status
         -float nota
+        +titulo() String
+        +numeroTemporada() int
+        +numeroEpisodio() int
+        +duracaoMinutos() int
         +status() StatusVisualizacao
         +nota() float
     }
@@ -86,15 +91,35 @@ classDiagram
         +removerMidia(midia: Midia) void
     }
 
+    class FastAPIRouter {
+        +post_midia() void
+        +put_avaliar() void
+        +get_listar() List~Midia~
+        +get_relatorios() Map
+        +put_atualizar_status_serie() void
+        +post_lista_usuario() void
+    }
+
+    class GerenciadorDados {
+        -String caminhoArquivo
+        +salvarDados(usuarios: List~Usuario~, midias: List~Midia~) void
+        +carregarDados() Map
+    }
+
     class RegistroHistorico {
         -DateTime dataHora
         -Midia midia
+        +dataHora() DateTime
+        +midia() Midia
     }
 
     class Configuracao {
         -float notaMinimaRecomendado
         -int limiteListasPorUsuario
         -float multiplicadorDuracao
+        +notaMinimaRecomendado() float
+        +limiteListasPorUsuario() int
+        +multiplicadorDuracao() float
         +carregarSettings(caminho: String) Configuracao
     }
 
@@ -124,8 +149,14 @@ classDiagram
     ListaPersonalizada "*" o-- "*" Midia : agrupa
     RegistroHistorico --> Midia : refere-se
 
+    %% Relacionamentos da API e Banco de Dados
+    FastAPIRouter --> Usuario : gerencia requisições
+    FastAPIRouter --> Midia : gerencia requisições
+    FastAPIRouter --> RelatorioService : consome
+    GerenciadorDados ..> Usuario : salva/carrega
+    GerenciadorDados ..> Midia : salva/carrega
+
     %% Serviços e Configurações
     RelatorioService ..> Midia : analisa
     RelatorioService ..> Configuracao : consulta
 ```
-
