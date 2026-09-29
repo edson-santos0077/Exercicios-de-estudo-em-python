@@ -28,6 +28,8 @@ classDiagram
         +titulo() String
         +nota() float
         +status() StatusVisualizacao
+        +avaliar(valor: float) void      
+        +alterarStatus(novoStatus: StatusVisualizacao) void
         +__str__() String
         +__repr__() String
         +__eq__(other: Midia) bool
@@ -72,6 +74,8 @@ classDiagram
         +duracaoMinutos() int
         +status() StatusVisualizacao
         +nota() float
+        +avaliar(valor: float) void
+        +alterarStatus(novoStatus: StatusVisualizacao) void
     }
 
     class Usuario {
@@ -91,14 +95,15 @@ classDiagram
         +removerMidia(midia: Midia) void
     }
 
-    class FastAPIRouter {
-        +post_midia() void
-        +put_avaliar() void
+    class InterfaceFastAPI {
+        +post_midia() String
+        +put_avaliar() String
         +get_listar() List~Midia~
         +get_relatorios() Map
-        +put_atualizar_status_serie() void
-        +post_lista_usuario() void
+        +put_atualizar_status_serie() String
+        +post_lista_usuario() String
     }
+
 
     class GerenciadorDados {
         -String caminhoArquivo
@@ -150,13 +155,8 @@ classDiagram
     RegistroHistorico --> Midia : refere-se
 
     %% Relacionamentos da API e Banco de Dados
-    FastAPIRouter --> Usuario : gerencia requisições
-    FastAPIRouter --> Midia : gerencia requisições
-    FastAPIRouter --> RelatorioService : consome
+    InterfaceFastAPI --> Usuario : gerencia requisições
+    InterfaceFastAPI --> Midia : gerencia requisições
+    InterfaceFastAPI --> RelatorioService : consome
     GerenciadorDados ..> Usuario : salva/carrega
-    GerenciadorDados ..> Midia : salva/carrega
-
-    %% Serviços e Configurações
-    RelatorioService ..> Midia : analisa
-    RelatorioService ..> Configuracao : consulta
-```
+    GerenciadorDados ..> Midia : salva/
