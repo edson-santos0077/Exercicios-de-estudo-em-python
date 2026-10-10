@@ -68,6 +68,7 @@ catalogo_filmes/
 
 Abaixo encontra-se a representação da modelação orientada a objetos do projeto, ilustrando os relacionamentos de herança, composição e agregação:
 
+
 ```mermaid
 classDiagram
     direction TB
@@ -128,7 +129,9 @@ classDiagram
         +data_conclusao() datetime | None
         +status() StatusVisualizacao
         +duracao_minutos()* int
-        +alterar_status(novo_status: StatusVisualizacao) void
+        +alterar_status(novo_status: StatusVisualizacao) void <<@registrar_evento>>
+        +from_dict(dados: dict)$ Midia
+        +converter_minutos_para_horas(minutos: int, multiplicador: float)$ float
         +__str__() String
         +__repr__() String
         +__eq__(outro: Object) bool
@@ -176,7 +179,7 @@ classDiagram
         +duracao_minutos() int
         +data_lancamento() date | None
         +status() StatusVisualizacao
-        +alterar_status(novo_status: StatusVisualizacao) void
+        +alterar_status(novo_status: StatusVisualizacao) void <<@registrar_evento>>
         +__repr__() String
         +__str__() String
     }
@@ -225,7 +228,6 @@ classDiagram
     Usuario "1" *-- "*" RegistroHistorico : registra
     ListaPersonalizada "*" o-- "*" Midia : agrupa
     RegistroHistorico --> Midia : refere-se
+
 ```
-
-
 
