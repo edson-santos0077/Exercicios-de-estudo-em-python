@@ -274,6 +274,11 @@ classDiagram
     ListaPersonalizada "*" o-- "*" Midia : agrupa
     RegistroHistorico --> Midia : refere-se
 
+    %% Uso de Enums
+    Midia --> TipoMidia : possui
+    Midia --> StatusVisualizacao : possui
+    Episodio --> StatusVisualizacao : possui
+
     %% ==========================================
     %% FLUXO DOS FRAMEWORKS EXTERNOS
     %% ==========================================
