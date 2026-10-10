@@ -85,131 +85,133 @@ classDiagram
         SERIE
     }
 
+    class DominioError {
+        <<exception>>
+    }
+    class ValorInvalidoError {
+        <<exception>>
+    }
+    class EstadoInvalidoError {
+        <<exception>>
+    }
+
+    DominioError <|-- ValorInvalidoError
+    DominioError <|-- EstadoInvalidoError
+
+    class AvaliavelMixin {
+        <<mixin>>
+        -_nota: float | None
+        +nota() float | None
+        +avaliar(valor: float) void
+    }
+
+    class SerializavelMixin {
+        <<mixin>>
+        +to_dict() dict
+    }
+
     class Midia {
         <<abstract>>
-        #String titulo
-        #TipoMidia tipo
-        #String genero
-        #int ano
-        #String classificacaoIndicativa
-        #List~String~ elenco
-        #StatusVisualizacao status
-        #float nota
+        -_titulo: String
+        -_tipo: TipoMidia
+        -_genero: String
+        -_ano: int
+        -classificacao_indicativa: String
+        -_elenco: List~String~
+        -_status: StatusVisualizacao
+        -_data_conclusao: datetime | None
         +titulo() String
-        +nota() float
+        +genero() String
+        +ano() int
+        +tipo() TipoMidia
+        +elenco() List~String~
+        +data_conclusao() datetime | None
         +status() StatusVisualizacao
-        +avaliar(valor: float) void      
-        +alterarStatus(novoStatus: StatusVisualizacao) void
+        +duracao_minutos()* int
+        +alterar_status(novo_status: StatusVisualizacao) void
         +__str__() String
         +__repr__() String
-        +__eq__(other: Midia) bool
-        +__lt__(other: Midia) bool
+        +__eq__(outro: Object) bool
+        +__lt__(outro: Object) bool
     }
 
     class Filme {
-        -int duracaoMinutos
-        +duracaoMinutos() int
+        -_duracao_minutos: int
+        +duracao_minutos() int
         +__str__() String
     }
 
     class Serie {
-        -List~Temporada~ temporadas
-        +duracaoMinutos() int
-        +nota() float
-        +atualizarStatus() void
-        +adicionarTemporada(temporada: Temporada) void
+        -temporadas: List~Temporada~
+        +duracao_minutos() int
+        +nota() float | None
+        +atualizar_status() void
+        +adicionar_temporada(temporada: Temporada) void
         +__len__() int
+        +__str__() String
     }
 
     class Temporada {
-        -int numero
-        -List~Episodio~ episodios
+        -_numero: int
+        -episodios: List~Episodio~
         +numero() int
-        +duracaoMinutos() int
-        +adicionarEpisodio(episodio: Episodio) void
-        +calcularNotaMedia() float
+        +duracao_minutos() int
+        +adicionar_episodio(episodio: Episodio) void
+        +calcular_nota_media() float | None
+        +__len__() int
+        +__repr__() String
+        +__str__() String
     }
 
     class Episodio {
-        -int numeroTemporada
-        -int numeroEpisodio
-        -String titulo
-        -int duracaoMinutos
-        -Date dataLancamento
-        -StatusVisualizacao status
-        -float nota
+        -_numero_temporada: int
+        -_numero_episodio: int
+        -_titulo: String
+        -_duracao_minutos: int
+        -_data_lancamento: date | None
+        -_status: StatusVisualizacao
         +titulo() String
-        +numeroTemporada() int
-        +numeroEpisodio() int
-        +duracaoMinutos() int
+        +numero_temporada() int
+        +numero_episodio() int
+        +duracao_minutos() int
+        +data_lancamento() date | None
         +status() StatusVisualizacao
-        +nota() float
-        +avaliar(valor: float) void
-        +alterarStatus(novoStatus: StatusVisualizacao) void
+        +alterar_status(novo_status: StatusVisualizacao) void
+        +__repr__() String
+        +__str__() String
     }
 
     class Usuario {
-        -String id
-        -String nome
-        -String email
-        -List~ListaPersonalizada~ listas
-        -List~RegistroHistorico~ historico
-        +criarLista(nome: String) ListaPersonalizada
-        +adicionarFavorito(midia: Midia) void
+        -id_usuario: String
+        -nome: String
+        -email: String
+        +criar_lista(nome: String) ListaPersonalizada
+        +adicionar_favorito(midia: Midia) void
     }
 
     class ListaPersonalizada {
-        -String nome
-        -List~Midia~ midias
-        +adicionarMidia(midia: Midia) void
-        +removerMidia(midia: Midia) void
-    }
-
-    class InterfaceFastAPI {
-        +post_midia() String
-        +put_avaliar() String
-        +get_listar() List~Midia~
-        +get_relatorios() Map
-        +put_atualizar_status_serie() String
-        +post_lista_usuario() String
-    }
-
-
-    class GerenciadorDados {
-        -String caminhoArquivo
-        +salvarDados(usuarios: List~Usuario~, midias: List~Midia~) void
-        +carregarDados() Map
+        -nome: String
+        +adicionar_midia(midia: Midia) void
+        +remover_midia(midia: Midia) void
     }
 
     class RegistroHistorico {
-        -DateTime dataHora
-        -Midia midia
-        +dataHora() DateTime
-        +midia() Midia
+        -midia: Midia
+        -data_hora: datetime
+        +data_hora() datetime
     }
 
-    class Configuracao {
-        -float notaMinimaRecomendado
-        -int limiteListasPorUsuario
-        -float multiplicadorDuracao
-        +notaMinimaRecomendado() float
-        +limiteListasPorUsuario() int
-        +multiplicadorDuracao() float
-        +carregarSettings(caminho: String) Configuracao
-    }
+    %% Mixins
+    AvaliavelMixin <|-- Midia : Utiliza
+    SerializavelMixin <|-- Midia : Utiliza
+    AvaliavelMixin <|-- Episodio : Utiliza
+    SerializavelMixin <|-- Episodio : Utiliza
 
-    class RelatorioService {
-        +mediaNotasPorGenero(midias: List~Midia~) Map
-        +tempoTotalAssistido(midias: List~Midia~, multiplicador: float) float
-        +top10MaisAvaliados(midias: List~Midia~) List~Midia~
-        +seriesComMaisEpisodiosAssistidos(series: List~Serie~) List~Serie~
-    }
-
-    %% Relacionamentos de Herança
+    %% Herança
     Midia <|-- Filme : Herança
     Midia <|-- Serie : Herança
 
-    %% Agregação e Composição de Séries
+    %% Agregação e Composição
     Serie "1" o-- "*" Temporada : Agrega
     Temporada "1" *-- "*" Episodio : Contém (Composição)
 
@@ -218,23 +220,11 @@ classDiagram
     Midia --> StatusVisualizacao : possui
     Episodio --> StatusVisualizacao : possui
 
-    %% Relacionamentos de Usuário
+    %% Relacionamentos do Usuário
     Usuario "1" *-- "*" ListaPersonalizada : gerencia
     Usuario "1" *-- "*" RegistroHistorico : registra
     ListaPersonalizada "*" o-- "*" Midia : agrupa
     RegistroHistorico --> Midia : refere-se
-
-    %% Relacionamentos da API e Banco de Dados
-    InterfaceFastAPI --> Usuario : gerencia requisições
-    InterfaceFastAPI --> Midia : gerencia requisições
-    InterfaceFastAPI --> RelatorioService : consome
-    GerenciadorDados ..> Usuario : salva/carrega
-    GerenciadorDados ..> Midia : salva/carrega
-
-    %% Serviços e Configurações
-    RelatorioService ..> Midia : analisa
-    RelatorioService ..> Configuracao : consulta
-
 ```
 
 
