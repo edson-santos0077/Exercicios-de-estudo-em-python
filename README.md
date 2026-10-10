@@ -73,6 +73,41 @@ Abaixo encontra-se a representação da modelação orientada a objetos do proje
 classDiagram
     direction TB
 
+    %% ==========================================
+    %% CAMADA DE INTERFACE (FASTAPI)
+    %% ==========================================
+    class RotasAPI {
+        <<Router - FastAPI>>
+        +criar_midia(payload: MidiaSchemaCreate)
+        +listar_midias()
+        +obter_relatorios()
+    }
+
+    class MidiaSchemaCreate {
+        <<Pydantic Schema>>
+        +titulo: str
+        +tipo: str
+        +ano: int
+        +duracao_minutos: int
+    }
+
+    %% ==========================================
+    %% CAMADA DE PERSISTÊNCIA (SQLITE / ORM)
+    %% ==========================================
+    class MidiaRepository {
+        <<Repository>>
+        -db_session: Session
+        +salvar(midia: Midia)
+        +buscar_por_id(id: int) Midia
+    }
+
+    class ORMBase {
+        <<SQLAlchemy / SQLModel Base>>
+    }
+
+    %% ==========================================
+    %% ENUMS E EXCEÇÕES DE DOMÍNIO
+    %% ==========================================
     class StatusVisualizacao {
         <<enumeration>>
         NAO_ASSISTIDO
@@ -86,19 +121,16 @@ classDiagram
         SERIE
     }
 
-    class DominioError {
-        <<exception>>
-    }
-    class ValorInvalidoError {
-        <<exception>>
-    }
-    class EstadoInvalidoError {
-        <<exception>>
-    }
+    class DominioError { <<exception>> }
+    class ValorInvalidoError { <<exception>> }
+    class EstadoInvalidoError { <<exception>> }
 
     DominioError <|-- ValorInvalidoError
     DominioError <|-- EstadoInvalidoError
 
+    %% ==========================================
+    %% MIXINS
+    %% ==========================================
     class AvaliavelMixin {
         <<mixin>>
         -_nota: float | None
@@ -111,8 +143,11 @@ classDiagram
         +to_dict() dict
     }
 
+    %% ==========================================
+    %% CAMADA DE DOMÍNIO (MAPEADA NO ORM)
+    %% ==========================================
     class Midia {
-        <<abstract>>
+        <<abstract / ORM Model>>
         -_titulo: String
         -_tipo: TipoMidia
         -_genero: String
@@ -139,12 +174,14 @@ classDiagram
     }
 
     class Filme {
+        <<ORM Model>>
         -_duracao_minutos: int
         +duracao_minutos() int
         +__str__() String
     }
 
     class Serie {
+        <<ORM Model>>
         -temporadas: List~Temporada~
         +duracao_minutos() int
         +nota() float | None
@@ -155,6 +192,7 @@ classDiagram
     }
 
     class Temporada {
+        <<ORM Model>>
         -_numero: int
         -episodios: List~Episodio~
         +numero() int
@@ -167,6 +205,7 @@ classDiagram
     }
 
     class Episodio {
+        <<ORM Model>>
         -_numero_temporada: int
         -_numero_episodio: int
         -_titulo: String
@@ -185,6 +224,7 @@ classDiagram
     }
 
     class Usuario {
+        <<ORM Model>>
         -id_usuario: String
         -nome: String
         -email: String
@@ -193,41 +233,53 @@ classDiagram
     }
 
     class ListaPersonalizada {
+        <<ORM Model>>
         -nome: String
         +adicionar_midia(midia: Midia) void
         +remover_midia(midia: Midia) void
     }
 
     class RegistroHistorico {
+        <<ORM Model>>
         -midia: Midia
         -data_hora: datetime
         +data_hora() datetime
     }
 
-    %% Mixins
+    %% ==========================================
+    %% RELACIONAMENTOS DE HERANÇA E ORM
+    %% ==========================================
+    ORMBase <|-- Midia : Herda
+    ORMBase <|-- Temporada : Herda
+    ORMBase <|-- Episodio : Herda
+    ORMBase <|-- Usuario : Herda
+    ORMBase <|-- ListaPersonalizada : Herda
+    ORMBase <|-- RegistroHistorico : Herda
+
+    Midia <|-- Filme : Herança (Polimorfismo)
+    Midia <|-- Serie : Herança (Polimorfismo)
+
     AvaliavelMixin <|-- Midia : Utiliza
     SerializavelMixin <|-- Midia : Utiliza
     AvaliavelMixin <|-- Episodio : Utiliza
     SerializavelMixin <|-- Episodio : Utiliza
 
-    %% Herança
-    Midia <|-- Filme : Herança
-    Midia <|-- Serie : Herança
-
-    %% Agregação e Composição
+    %% ==========================================
+    %% RELACIONAMENTOS DE ASSOCIAÇÃO
+    %% ==========================================
     Serie "1" o-- "*" Temporada : Agrega
     Temporada "1" *-- "*" Episodio : Contém (Composição)
-
-    %% Uso de Enums
-    Midia --> TipoMidia : possui
-    Midia --> StatusVisualizacao : possui
-    Episodio --> StatusVisualizacao : possui
-
-    %% Relacionamentos do Usuário
     Usuario "1" *-- "*" ListaPersonalizada : gerencia
     Usuario "1" *-- "*" RegistroHistorico : registra
     ListaPersonalizada "*" o-- "*" Midia : agrupa
     RegistroHistorico --> Midia : refere-se
+
+    %% ==========================================
+    %% FLUXO DOS FRAMEWORKS EXTERNOS
+    %% ==========================================
+    RotasAPI ..> MidiaSchemaCreate : Valida JSON
+    RotasAPI --> MidiaRepository : Solicita Operações
+    MidiaRepository --> Midia : Persiste no SQLite
 
 ```
 
