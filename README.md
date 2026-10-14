@@ -40,7 +40,7 @@ catalogo_filmes/
 ├── dados.py                 # Módulo exigido para persistência (GerenciadorDados)
 ├── settings.json            # Ficheiro de configurações exigido no projeto
 ├── README.md                # O seu ficheiro com a explicação, objetivo e Mermaid
-├── requirements.txt         # Lista de dependências (fastapi, uvicorn, pytest)
+├── requirements.txt         # Lista de dependências (fastapi, pytest)
 │
 ├── api/                     # Camada de Interface (Rotas FastAPI)
 │   ├── __init__.py
@@ -347,10 +347,27 @@ classDiagram
     classDef enumStyle fill:#b45309,color:#ffffff,stroke:#d97706,stroke-width:2px;
     classDef mixinStyle fill:#6b21a8,color:#ffffff,stroke:#9333ea,stroke-width:2px;
 
-    class RotasAPI,MidiaSchemaCreate interfaceStyle;
-    class MidiaRepository,MidiaRepositoryJSON,MidiaRepositorySQLite,UsuarioRepository,UsuarioRepositoryJSON repoStyle;
-    class Midia,Filme,Serie,Temporada,Episodio,Usuario,ListaPersonalizada,RegistroHistorico domainStyle;
-    class StatusVisualizacao,TipoMidia,DominioError,ValorInvalidoError,EstadoInvalidoError enumStyle;
-    class AvaliavelMixin,SerializavelMixin mixinStyle;
+    class RotasAPI interfaceStyle
+    class MidiaSchemaCreate interfaceStyle
+    class MidiaRepository repoStyle
+    class MidiaRepositoryJSON repoStyle
+    class MidiaRepositorySQLite repoStyle
+    class UsuarioRepository repoStyle
+    class UsuarioRepositoryJSON repoStyle
+    class Midia domainStyle
+    class Filme domainStyle
+    class Serie domainStyle
+    class Temporada domainStyle
+    class Episodio domainStyle
+    class Usuario domainStyle
+    class ListaPersonalizada domainStyle
+    class RegistroHistorico domainStyle
+    class StatusVisualizacao enumStyle
+    class TipoMidia enumStyle
+    class DominioError enumStyle
+    class ValorInvalidoError enumStyle
+    class EstadoInvalidoError enumStyle
+    class AvaliavelMixin mixinStyle
+    class SerializavelMixin mixinStyle
 ```
 
