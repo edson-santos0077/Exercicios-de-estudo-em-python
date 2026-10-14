@@ -76,9 +76,11 @@ Abaixo encontra-se a representação da modelação orientada a objetos do proje
     'themeVariables': {
       'primaryColor': '#1e293b',
       'primaryTextColor': '#f8fafc',
-      'primaryBorderColor': '#334155',
-      'lineColor': '#64748b',
-      'tertiaryColor': '#ffffff',
+      'primaryBorderColor': '#475569',
+      'lineColor': '#94a3b8',
+      'tertiaryColor': 'transparent',
+      'tertiaryBorderColor': '#64748b',
+      'tertiaryTextColor': '#94a3b8',
       'fontFamily': 'ui-sans-serif, system-ui, sans-serif'
     }
   }
