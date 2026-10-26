@@ -81,8 +81,9 @@ Abaixo encontra-se a representação da modelação orientada a objetos do proje
       'tertiaryColor': 'transparent',
       'tertiaryBorderColor': '#64748b',
       'tertiaryTextColor': '#94a3b8',
-      'fontFamily': 'ui-sans-serif, system-ui, sans-serif'
-    }
+      'fontSize': '11px'
+    },
+    'themeCSS': 'g.classGroup text { font-size: 11px !important; } .nodeLabel { padding: 8px !important; }'
   }
 }%%
 classDiagram
