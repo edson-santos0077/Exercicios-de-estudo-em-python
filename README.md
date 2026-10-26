@@ -72,6 +72,10 @@ Abaixo encontra-se a representação da modelação orientada a objetos do proje
 %%{
   init: {
     'theme': 'base',
+    'class': {
+      'nodeSpacing': 25,
+      'rankSpacing': 25
+    },
     'themeVariables': {
       'primaryColor': '#1e293b',
       'primaryTextColor': '#f8fafc',
