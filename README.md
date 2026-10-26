@@ -68,7 +68,6 @@ catalogo_filmes/
 
 Abaixo encontra-se a representação da modelação orientada a objetos do projeto, ilustrando os relacionamentos de herança, composição e agregação:
 
-
 ```mermaid
 %%{
   init: {
@@ -105,6 +104,28 @@ classDiagram
         }
     }
 
+    namespace Camada_Core {
+        class EventDispatcher {
+            <<Singleton>>
+            -_instancia: EventDispatcher
+            -_observadores: List~Observer~
+            +inscrever(observador)
+            +desinscrever(observador)
+            +emitir(nome_evento, dados)
+        }
+        class Observer {
+            <<Interface - ABC>>
+            +notificar(evento)*
+        }
+        class ConsoleLogger {
+            +notificar(evento)
+        }
+        class FileLogger {
+            -caminho: Path
+            +notificar(evento)
+        }
+    }
+
     namespace Camada_Repositorios {
         class MidiaRepository {
             <<Interface - ABC>>
@@ -126,14 +147,24 @@ classDiagram
     }
 
     namespace Camada_Dominio {
+        class AvaliavelMixin {
+            <<Mixin>>
+            #_nota: float
+            +avaliar(valor)
+        }
+        class SerializavelMixin {
+            <<Mixin>>
+            +to_dict() dict
+            +from_dict(dados)
+        }
         class Midia {
-            <<Abstract / Serializavel>>
-            #id: int | None
+            <<Abstract>>
+            #id: int
             #titulo: str
             #tipo: TipoMidia
             #status: StatusVisualizacao
-            #nota: float | None
-            +duracao_minutos()* int
+            #data_conclusao: datetime
+            +duracao_minutos() int
             +alterar_status(novo_status)
         }
         class Filme {
@@ -152,24 +183,23 @@ classDiagram
             +calcular_nota_media()
         }
         class Episodio {
-            <<Serializavel>>
-            -id: int | None
+            -id: int
             -titulo: str
             -duracao_minutos: int
             +alterar_status()
         }
         class Usuario {
-            <<Serializavel>>
-            -id_usuario: int | str | None
+            -id_usuario: str
             -nome: str
             -email: str
+            -limite_listas: int
             +criar_lista()
             +adicionar_favorito()
             +registrar_historico()
         }
         class ListaPersonalizada {
             -nome: str
-            -midias: dict~int, Midia~
+            -midias: dict
             +adicionar_midia()
             +remover_midia()
         }
@@ -192,11 +222,13 @@ classDiagram
         }
     }
 
-    %% Relacionamentos de Repositórios
-    MidiaRepository <|-- MidiaRepositoryJSON
-    MidiaRepository <|-- MidiaRepositorySQLite
+    %% Herança de Mixins e Domínio
+    AvaliavelMixin <|-- Midia
+    SerializavelMixin <|-- Midia
+    SerializavelMixin <|-- Usuario
+    SerializavelMixin <|-- ListaPersonalizada
+    SerializavelMixin <|-- RegistroHistorico
 
-    %% Herança do Domínio
     Midia <|-- Filme
     Midia <|-- Serie
 
@@ -212,11 +244,17 @@ classDiagram
     Midia --> TipoMidia
     Midia --> StatusVisualizacao
 
-    %% Integração de Camadas
+    %% Estrutura do Observer
+    Observer <|-- ConsoleLogger
+    Observer <|-- FileLogger
+    EventDispatcher "1" o-- "*" Observer
+    Midia ..> EventDispatcher : emite eventos
+    Usuario ..> EventDispatcher : emite eventos
+
+    %% Persistência e API
+    MidiaRepository <|-- MidiaRepositoryJSON
+    MidiaRepository <|-- MidiaRepositorySQLite
     RotasAPI ..> MidiaSchemaCreate
     RotasAPI --> MidiaRepository
-    MidiaRepositoryJSON ..> Midia
     MidiaRepositorySQLite ..> Midia
-    UsuarioRepositoryJSON ..> Usuario
 ```
-
