@@ -69,39 +69,17 @@ catalogo_filmes/
 Abaixo encontra-se a representação da modelação orientada a objetos do projeto, ilustrando os relacionamentos de herança, composição e agregação:
 
 ```mermaid
-%%{
-  init: {
-    'theme': 'base',
-    'class': {
-      'nodeSpacing': 25,
-      'rankSpacing': 25
-    },
-    'themeVariables': {
-      'primaryColor': '#1e293b',
-      'primaryTextColor': '#f8fafc',
-      'primaryBorderColor': '#475569',
-      'lineColor': '#94a3b8',
-      'tertiaryColor': 'transparent',
-      'tertiaryBorderColor': '#64748b',
-      'tertiaryTextColor': '#94a3b8',
-      'fontSize': '11px'
-    },
-    'themeCSS': 'g.classGroup text { font-size: 11px !important; } .nodeLabel { padding: 8px !important; }'
-  }
-}%%
 classDiagram
-    direction LR
+    direction TB
 
     namespace Camada_API {
         class RotasAPI {
-            <<Router - FastAPI>>
             +criar_midia()
             +listar_midias()
             +criar_usuario()
             +obter_relatorios()
         }
         class MidiaSchemaCreate {
-            <<Pydantic Schema>>
             +titulo: str
             +tipo: str
             +duracao_minutos: int
@@ -110,7 +88,6 @@ classDiagram
 
     namespace Camada_Core {
         class EventDispatcher {
-            <<Singleton>>
             -_instancia: EventDispatcher
             -_observadores: List~Observer~
             +inscrever(observador)
@@ -118,7 +95,7 @@ classDiagram
             +emitir(nome_evento, dados)
         }
         class Observer {
-            <<Interface - ABC>>
+            <<Interface>>
             +notificar(evento)*
         }
         class ConsoleLogger {
@@ -132,7 +109,7 @@ classDiagram
 
     namespace Camada_Repositorios {
         class MidiaRepository {
-            <<Interface - ABC>>
+            <<Interface>>
             +salvar_todos(midias)*
             +carregar_todos()*
         }
@@ -152,12 +129,10 @@ classDiagram
 
     namespace Camada_Dominio {
         class AvaliavelMixin {
-            <<Mixin>>
             #_nota: float
             +avaliar(valor)
         }
         class SerializavelMixin {
-            <<Mixin>>
             +to_dict() dict
             +from_dict(dados)
         }
@@ -226,7 +201,7 @@ classDiagram
         }
     }
 
-    %% Herança de Mixins e Domínio
+    %% Herança e Mixins
     AvaliavelMixin <|-- Midia
     SerializavelMixin <|-- Midia
     SerializavelMixin <|-- Usuario
@@ -244,16 +219,16 @@ classDiagram
     ListaPersonalizada "*" o-- "*" Midia
     RegistroHistorico --> Midia
 
-    %% Uso de Enums
+    %% Enums
     Midia --> TipoMidia
     Midia --> StatusVisualizacao
 
-    %% Estrutura do Observer
+    %% Observer Pattern
     Observer <|-- ConsoleLogger
     Observer <|-- FileLogger
     EventDispatcher "1" o-- "*" Observer
-    Midia ..> EventDispatcher : emite eventos
-    Usuario ..> EventDispatcher : emite eventos
+    Midia ..> EventDispatcher
+    Usuario ..> EventDispatcher
 
     %% Persistência e API
     MidiaRepository <|-- MidiaRepositoryJSON
