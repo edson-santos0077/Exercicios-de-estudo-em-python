@@ -86,7 +86,7 @@ Abaixo encontra-se a representação da modelação orientada a objetos do proje
   }
 }%%
 classDiagram
-    direction TB
+    direction LR
 
     namespace Camada_API {
         class RotasAPI {
